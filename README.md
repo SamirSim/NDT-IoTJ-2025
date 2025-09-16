@@ -22,6 +22,12 @@ This project contains firmware, scripts, and analysis tools for running experime
 - **`plot-results-split-boxplot.py`**: Generates comparative boxplots for different prediction approaches.
 - **`plot_results.py`**: Plots model results focusing on the 70% training data split.
 - **`print_common_configurations_table.py`**: Analyzes and prints statistics on retransmissions across common configurations.
+- **`clusterize_links_ranks.py`**: Clusterizes links according to their performance on similar configurations (the procedure is described in the paper). Return a dict containing the node ids in each cluster.
+- **`clusterize_links_pdr.py`**: Clusterizes links according to their mean PRR over all configurations. Return a dict containing the node ids in each cluster.
+- **`learn_combined_multiple_runs_clustering.py`**: Performs a training/testing process on the single, merged, k-NN and cluster-based techniques on the provided data. The clusters are specified in the beginning of the script.
+- **`test_generalization_clustering(_online).py`**: Tests the trained models with the data from each cluster on additional nodes (not existent in the original experiment) to evaluate the generalization precision. The online version consists in constantly refitting the model with data from the new link.
+- **`plot_results_clustering.py`**: Plot the obtained results for the cluster-based techniques.
+
 
 ### `code/expe/` - Experiment Firmware & Execution Scripts
 
@@ -33,7 +39,10 @@ This project contains firmware, scripts, and analysis tools for running experime
 
 ### `data/` - Experiment Logs
 
-- **`diff-config-long-*.txt`**: Raw logs from FIT IoT-Lab experiments, later processed for analysis.
+- **`AINA/diff-config-long-*.txt`**: Raw logs from FIT IoT-Lab experiments, later processed for analysis.
+- **`IoTJ/expe-iotj-1ps-*.txt`**: Raw logs from FIT IoT-Lab experiments for the IoTJ paper, with 1 packet per second, later processed for analysis.
+- **`IoTJ/5ps/expe-iotj-*.txt`**: Raw logs from FIT IoT-Lab experiments for the IoTJ paper, with 5 packets per second, later processed for analysis (not shown in the paper).
+
 
 ## Usage
 
