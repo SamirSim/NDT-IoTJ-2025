@@ -1,0 +1,5 @@
+data/*.txt filter=lfs diff=lfs merge=lfs -text
+data/AINA/*.txt filter=lfs diff=lfs merge=lfs -text
+data/other/*.txt filter=lfs diff=lfs merge=lfs -text
+data/IoTJ/*.txt filter=lfs diff=lfs merge=lfs -text
+data/IoTJ/5ps/*.txt filter=lfs diff=lfs merge=lfs -text
