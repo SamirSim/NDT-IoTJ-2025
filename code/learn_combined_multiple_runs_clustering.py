@@ -16,6 +16,7 @@ import seaborn as sns # type: ignore
 from sklearn.metrics import mean_absolute_error # type: ignore
 
 import random
+import time
 from time import sleep
 
 # Function to compute statistical data
@@ -79,6 +80,7 @@ cluster_mean = {'0': ['m3-170', 'm3-167'], '2': ['m3-131', 'm3-129', 'm3-168', '
 #cluster_ranks = {'2': ['m3-111', 'm3-130', 'm3-120', 'm3-129', 'm3-110', 'm3-154', 'm3-131', 'm3-121', 'm3-133', 'm3-98', 'm3-109', 'm3-157', 'm3-169', 'm3-97', 'm3-112', 'm3-122', 'm3-119', 'm3-153', 'm3-99', 'm3-100'], '0': ['m3-156', 'm3-168'], '1': ['m3-170'], '3': ['m3-167']}
 cluster_ranks = {'1': ['m3-111', 'm3-120', 'm3-129', 'm3-110', 'm3-167', 'm3-131', 'm3-121', 'm3-133', 'm3-157', 'm3-122', 'm3-119', 'm3-153', 'm3-99'], '3': ['m3-130', 'm3-156', 'm3-154', 'm3-109', 'm3-97', 'm3-112'], '0': ['m3-170', 'm3-168', 'm3-169'], '2': ['m3-98', 'm3-100']}
 
+times = {}
 for node_id in ("m3-97","m3-98","m3-99","m3-100","m3-109","m3-110","m3-111","m3-112","m3-119","m3-120","m3-121","m3-122","m3-129","m3-130","m3-131","m3-133","m3-143","m3-153","m3-154","m3-156","m3-157","m3-167","m3-168","m3-169","m3-170"):
     targets = ['mean']  # Define target variables
 
@@ -312,6 +314,7 @@ for node_id in ("m3-97","m3-98","m3-99","m3-100","m3-109","m3-110","m3-111","m3-
                 print(X_cluster_ranks)
                 """ Changed in the previous """
                 
+                start_single = time.time()
                 model = None
                 # Train and evaluate each model
                 for name, model in models.items():
@@ -348,8 +351,11 @@ for node_id in ("m3-97","m3-98","m3-99","m3-100","m3-109","m3-110","m3-111","m3-
                     if avg_mse < best_mse:
                         best_mse = avg_mse
                         best_model = name
-                
+                end_single = time.time()
+                time_single = end_single - start_single
+
                 # Evaluate the naive model
+                start_naive = time.time()
                 y_pred = []
                 for index, row in X_test.iterrows():
                     y_pred.append(predict(list(zip(X_train.values, y_train.values)), row.values))
@@ -395,11 +401,14 @@ for node_id in ("m3-97","m3-98","m3-99","m3-100","m3-109","m3-110","m3-111","m3-
                     if avg_mse < best_mse_merged:
                         best_mse_merged = avg_mse
                         best_model_merged = name
+                end_naive = time.time()
+                time_naive = end_naive - start_naive
                 #print(results_merged[best_model_merged]['mse'])
 
                 # Compute results with clustering approaches
                 # Cluster topology
 
+                start_topology = time.time()
                 model = None
                 for name, model in models_merged.items():
                     # Train the model
@@ -437,7 +446,10 @@ for node_id in ("m3-97","m3-98","m3-99","m3-100","m3-109","m3-110","m3-111","m3-
                     if avg_mse < best_mse_cluster_topology:
                         best_mse_cluster_topology = avg_mse
                         best_model_cluster_topology = name
+                end_topology = time.time()
+                time_topology = end_topology - start_topology
 
+                start_mean = time.time()
                 # Cluster mean
                 model = None
                 for name, model in models_merged.items():
@@ -476,7 +488,11 @@ for node_id in ("m3-97","m3-98","m3-99","m3-100","m3-109","m3-110","m3-111","m3-
                     if avg_mse < best_mse_cluster_mean:
                         best_mse_cluster_mean = avg_mse
                         best_model_cluster_mean = name
+                end_mean = time.time()
+                time_mean = end_mean - start_mean
 
+
+                start_ranks = time.time()
                 # Cluster ranks
                 model = None
 
@@ -516,7 +532,15 @@ for node_id in ("m3-97","m3-98","m3-99","m3-100","m3-109","m3-110","m3-111","m3-
                     if avg_mse < best_mse_cluster_ranks:
                         best_mse_cluster_ranks = avg_mse
                         best_model_cluster_ranks = name
+                end_cluster_ranks = time.time()
+                time_cluster_ranks = end_cluster_ranks - start_ranks
 
+            times[node_id] = {
+                "mean": time_mean,
+                "topology": time_topology,
+                "single": time_single,
+                "cluster_ranks": time_cluster_ranks
+            }
 
             res_split[cut_off_] = {"model": best_model, "mse": results[best_model]['mse'], "mae": results[best_model]['mae'], "r2": results[best_model]['r2']}
             
@@ -557,6 +581,21 @@ for node_id in ("m3-97","m3-98","m3-99","m3-100","m3-109","m3-110","m3-111","m3-
 
 print(node_model)
 #sleep(10)
+
+print("Times: ", times)
+
+# Compute the average time of each method for all nodes
+avg_times = {}
+for node_id, time_data in times.items():
+    for method, time in time_data.items():
+        if method not in avg_times:
+            avg_times[method] = []
+        avg_times[method].append(time)
+
+for method, time_list in avg_times.items():
+    print(f"Average time for {method}: {np.mean(time_list)}")
+
+"""
 
 with open('../data/IoTJ/'+file_title+'-ps-results-mul-runs-split.json', 'w') as outfile:
     json.dump(node_model, outfile, indent=4)
@@ -638,3 +677,4 @@ for cut_off, mses in avg_mse.items():
     avg_mse_value = np.mean(mses)
     print(f"Average MSE for standard approach with cut-off {cut_off}: {avg_mse_value}")
 
+"""

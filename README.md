@@ -1,8 +1,15 @@
 # FIT IoT-Lab CSMA Experimentation
 
-This code corresponds to the two contributions described in the following paper (please cite this in case you use the code):
+This code corresponds to the two contributions described in the following papers (please cite this in case you use the code):
 
 ```
+@article{si2026group-modeling,
+  title={Group-Based Link Modeling for Wireless Digital Twins: Towards Accurate Network Performance Prediction},
+  author={Si-Mohammed, Samir and Théoleyre, Fabrice},
+  journal={Elsevier Internet of Things journal (to appear)},
+  year={2026}
+}
+
 @article{si2025config-pred,
   title={Data-Driven Prediction Models for Wireless Network Configuration},
   author={Si-Mohammed, Samir and Théoleyre, Fabrice},

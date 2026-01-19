@@ -3,12 +3,13 @@ import json
 import numpy as np # type: ignore
 import time
 import seaborn as sns # type: ignore
+from matplotlib.patches import Rectangle
 
 sns.set(font_scale=2.4)
 
 #plt.rcParams['font.family'] = 'Helvetica'
 
-file_title = 'diff-config-long'
+file_title = 'AINA/diff-config-long'
 # Load data from JSON files
 with open('../data/' + file_title + '-results-mul-runs-split.json', 'r') as file: # Default split is 0.3
     data = json.load(file)
@@ -29,7 +30,7 @@ n_rows = 3
 n_cols = 2
 
 target = "mean"  # Choose between 'mean', 'std_dev', 'variance'
-metric = "mse"  # Choose between 'mse', 'mae', 'r2'
+metric = "mae"  # Choose between 'mse', 'mae', 'r2'
 
 # Initialize subplots with a grid layout
 fig, axes = plt.subplots(n_rows, n_cols, figsize=(24, 18), sharex=False, sharey=True)
@@ -122,11 +123,11 @@ for i in range(len(nodes_to_plot), n_rows * n_cols):
     fig.delaxes(axes[i])
 
 # Add common labels
-fig.text(0.5, 0.04, 'Split Ratios', ha='center', fontsize=14)
+fig.text(0.55, 0.04, 'Split Ratios', ha='center', fontsize=30)
 #fig.text(0.04, 0.5, 'MSE', va='center', rotation='vertical', fontsize=12)
 
 plt.tight_layout(rect=[0.05, 0.05, 1, 0.95])
 
 #plt.suptitle(f'Boxplots of MSE for Different Nodes for {target} reception ratio ', fontsize=30)
-plt.savefig(f'../figures/results-split-boxplot-2.pdf', format='pdf', bbox_inches='tight')
-plt.show()
+plt.savefig(f'../figures/results-split-boxplot-2-mae.pdf', format='pdf', bbox_inches='tight')
+#plt.show()
